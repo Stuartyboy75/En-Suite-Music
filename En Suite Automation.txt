@@ -1,0 +1,334 @@
+alias: En Suite Music
+description: ""
+triggers:
+  - trigger: state
+    entity_id:
+      - binary_sensor.en_suite_epo_occupancy
+    from:
+      - "off"
+    to:
+      - "on"
+    for:
+      hours: 0
+      minutes: 0
+      seconds: 45
+    id: En Suite Motion Detected
+    enabled: true
+  - trigger: state
+    entity_id:
+      - binary_sensor.en_suite_epo_occupancy
+    to:
+      - "off"
+    for:
+      hours: 0
+      minutes: 3
+      seconds: 0
+    id: En Suite Motion Clear
+    from:
+      - "on"
+    enabled: true
+  - trigger: numeric_state
+    entity_id:
+      - sensor.en_suite_epo_humidity
+    above: 74
+    id: En Suite Humidity Goes Above
+  - trigger: numeric_state
+    entity_id:
+      - sensor.en_suite_epo_humidity
+    id: En Suite Humidity Goes Below
+    below: 74
+conditions: []
+actions:
+  - alias: En Suite Motion Detected
+    if:
+      - condition: trigger
+        id:
+          - En Suite Motion Detected
+    then:
+      - choose:
+          - conditions:
+              - condition: state
+                entity_id: input_boolean.toggle_sds_house_day_mode
+                state:
+                  - "on"
+              - condition: state
+                state:
+                  - "off"
+                entity_id: binary_sensor.group_master_bedroom_bed_occupied
+              - condition: time
+                after: "06:45:00"
+                weekday:
+                  - mon
+                  - tue
+                  - wed
+                  - thu
+                  - fri
+                  - sat
+                  - sun
+                before: "21:00:00"
+              - condition: state
+                entity_id: binary_sensor.stuartscotts_iphone_focus
+                state:
+                  - "off"
+            sequence:
+              - choose:
+                  - conditions:
+                      - condition: state
+                        entity_id: media_player.master_bedroom
+                        state:
+                          - playing
+                    sequence:
+                      - action: media_player.volume_set
+                        data:
+                          volume_level: 0.26
+                        target:
+                          entity_id: media_player.en_suite
+                      - action: media_player.join
+                        metadata: {}
+                        data:
+                          group_members:
+                            - media_player.en_suite
+                        target:
+                          entity_id: media_player.master_bedroom
+                  - conditions:
+                      - condition: or
+                        conditions:
+                          - condition: state
+                            entity_id: media_player.master_bedroom
+                            state:
+                              - "off"
+                          - condition: state
+                            entity_id: media_player.master_bedroom
+                            state:
+                              - idle
+                          - condition: state
+                            entity_id: media_player.master_bedroom
+                            state:
+                              - paused
+                          - condition: state
+                            entity_id: media_player.master_bedroom
+                            state:
+                              - standby
+                          - condition: state
+                            entity_id: media_player.master_bedroom
+                            state:
+                              - buffering
+                          - condition: state
+                            entity_id: media_player.master_bedroom
+                            state:
+                              - unavailable
+                          - condition: state
+                            entity_id: media_player.master_bedroom
+                            state:
+                              - unknown
+                        alias: Master Bedroom Not Playing
+                    sequence:
+                      - choose:
+                          - conditions:
+                              - condition: state
+                                entity_id: media_player.kitchen
+                                state:
+                                  - playing
+                            sequence:
+                              - sequence:
+                                  - action: media_player.volume_set
+                                    data:
+                                      volume_level: 0.26
+                                    target:
+                                      entity_id: media_player.en_suite
+                                  - action: media_player.join
+                                    metadata: {}
+                                    data:
+                                      group_members:
+                                        - media_player.en_suite
+                                    target:
+                                      entity_id: media_player.kitchen
+                          - conditions:
+                              - condition: or
+                                conditions:
+                                  - condition: state
+                                    entity_id: media_player.kitchen
+                                    state:
+                                      - "off"
+                                  - condition: state
+                                    entity_id: media_player.kitchen
+                                    state:
+                                      - idle
+                                  - condition: state
+                                    entity_id: media_player.kitchen
+                                    state:
+                                      - paused
+                                  - condition: state
+                                    entity_id: media_player.kitchen
+                                    state:
+                                      - standby
+                                  - condition: state
+                                    entity_id: media_player.kitchen
+                                    state:
+                                      - buffering
+                                  - condition: state
+                                    entity_id: media_player.kitchen
+                                    state:
+                                      - unavailable
+                                  - condition: state
+                                    entity_id: media_player.kitchen
+                                    state:
+                                      - unknown
+                            sequence:
+                              - sequence:
+                                  - action: media_player.volume_set
+                                    data:
+                                      volume_level: 0.26
+                                    target:
+                                      entity_id: media_player.en_suite
+                                  - action: media_player.play_media
+                                    data:
+                                      media:
+                                        media_content_id: FV:2/22
+                                        media_content_type: favorite_item_id
+                                        metadata:
+                                          title: Clyde 1 (Ayrshire)
+                                          thumbnail: >-
+                                            https://sali.sonos.radio/image?w=60&image=https://cdn-profiles.tunein.com/s333341/images/logog.jpg%3Ft%3D18&partnerId=tunein
+                                          media_class: genre
+                                          children_media_class: null
+                                          navigateIds:
+                                            - {}
+                                            - media_content_type: favorites
+                                              media_content_id: ""
+                                            - media_content_type: favorites_folder
+                                              media_content_id: object.item.audioItem.audioBroadcast
+                                          browse_entity_id: media_player.en_suite
+                                    target:
+                                      entity_id: media_player.en_suite
+                                  - action: tts.speak
+                                    metadata: {}
+                                    data:
+                                      cache: true
+                                      message: Clyde 1
+                                      media_player_entity_id: media_player.en_suite
+                                    target:
+                                      entity_id: tts.google_en_com
+                            alias: Kitchen Is Not Playing
+  - alias: En Suite Motion Clear
+    if:
+      - condition: trigger
+        id:
+          - En Suite Motion Clear
+      - condition: state
+        entity_id: media_player.en_suite
+        state:
+          - playing
+    then:
+      - choose:
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.en_suite_epo_humidity
+                below: 70
+            sequence:
+              - sequence:
+                  - wait_template: "{{ states('sensor.en_suite_epo_humidity') | int(0) < 70}}"
+                    continue_on_timeout: false
+                    enabled: true
+                  - wait_template: "{{ is_state('binary_sensor.group_epo_en_suite', 'off') }}"
+                    continue_on_timeout: false
+              - sequence:
+                  - action: media_player.unjoin
+                    data: {}
+                    target:
+                      entity_id: media_player.en_suite
+                  - action: media_player.volume_set
+                    data:
+                      volume_level: 0.26
+                    target:
+                      entity_id: media_player.en_suite
+                  - action: media_player.media_pause
+                    data: {}
+                    target:
+                      entity_id: media_player.en_suite
+          - conditions:
+              - condition: numeric_state
+                entity_id: sensor.en_suite_epo_humidity
+                above: 70
+            sequence:
+              - sequence:
+                  - wait_template: "{{ states('sensor.en_suite_epo_humidity') | int(0) < 70}}"
+                    continue_on_timeout: false
+                    enabled: true
+                  - wait_template: "{{ is_state('binary_sensor.group_epo_en_suite', 'off') }}"
+                    continue_on_timeout: false
+              - sequence:
+                  - action: media_player.unjoin
+                    data: {}
+                    target:
+                      entity_id: media_player.en_suite
+                  - action: media_player.volume_set
+                    data:
+                      volume_level: 0.26
+                    target:
+                      entity_id: media_player.en_suite
+                  - action: media_player.media_pause
+                    data: {}
+                    target:
+                      entity_id: media_player.en_suite
+  - alias: En Suite Humidity Goes Above
+    if:
+      - condition: trigger
+        id:
+          - En Suite Humidity Goes Above
+        alias: En Suite Humidity Goes Above
+      - condition: state
+        entity_id: media_player.en_suite
+        state:
+          - playing
+      - condition: state
+        entity_id: input_boolean.toggle_sds_house_day_mode
+        state:
+          - "on"
+      - condition: state
+        state:
+          - "off"
+        entity_id: binary_sensor.group_master_bedroom_bed_occupied
+      - condition: time
+        after: "06:45:00"
+        weekday:
+          - mon
+          - tue
+          - wed
+          - thu
+          - fri
+          - sat
+          - sun
+        before: "21:00:00"
+      - condition: state
+        entity_id: binary_sensor.stuartscotts_iphone_focus
+        state:
+          - "off"
+      - condition: state
+        entity_id: binary_sensor.group_epo_en_suite
+        state:
+          - "on"
+    then:
+      - sequence:
+          - action: media_player.volume_set
+            data:
+              volume_level: 0.32
+            target:
+              entity_id: media_player.en_suite
+  - alias: En Suite Humidity Goes Below
+    if:
+      - condition: trigger
+        id:
+          - En Suite Humidity Goes Below
+      - condition: state
+        entity_id: media_player.en_suite
+        state:
+          - playing
+    then:
+      - action: media_player.volume_set
+        data:
+          volume_level: 0.26
+        target:
+          entity_id: media_player.en_suite
+        enabled: true
+mode: single

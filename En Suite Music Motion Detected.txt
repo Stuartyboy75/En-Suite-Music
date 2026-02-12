@@ -1,0 +1,57 @@
+Motion Detected
+
+Conditions
+House is in Day Mode
+Master Bedroom Bed is unoccupied
+Time is between 06:45 - 21:00
+
+Choose
+
+Is Master Bedroom Speaker Already playing
+If yes
+Action
+Set volume on En suite
+Join Master Bedroom Speaker
+
+Or
+
+Is Master Bedroom Speaker not playing
+Choose
+Is kitchen playing(this is the first speaker on every day)
+Action
+Set volume on En suite
+Join Kitchen Speaker
+
+If kitchen is not playing
+Action
+Set volume on En suite
+Start playing most used Radio station
+announce the radio station
+
+Motion Cleared(3 minutes)
+
+Conditions
+Is en suite playing
+
+Choose
+Is humidity above 70(Sensor struggles when shower has been on and there is a lot of steam)
+Templates to wait until humidity drops below 70
+Template to check there is no motion again
+
+Action
+Unjoin En suite
+Set volume En suite
+Pause En suite
+
+or
+
+Is humidity below 70
+Templates to wait until humidity drops below 70
+Template to check there is no motion again
+
+Action
+Unjoin En suite
+Set volume En suite
+Pause En suite
+
+There are also triggers for when the humidity goes above it turns the volume up and when goes below turns the volume down again
